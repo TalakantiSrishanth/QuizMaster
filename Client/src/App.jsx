@@ -1,6 +1,6 @@
 
 import './App.css'
-import Display from './Display';"./Display.jsx";
+import Display from './Display';
 function App() {
 
   return (

@@ -13,7 +13,7 @@ app.post("/api/mcqs", async (req, res) => {
     const prompt = `
       Give me 10 multiple-choice questions about ${topic} in JSON array format (important interview questions).
       Each item should have "question", "options" (array), and "answerIndex" (index of correct option).
-      Return ONLY valid JSON, no backticks, no code block, no extra text.
+      Return ONLY valid JSON, no backticks, no code block, no extra text. Do NOT include explanations, text, or extra commentary.Follow Exactly.
     `;
 
     const result = await model.generateContent(prompt);
