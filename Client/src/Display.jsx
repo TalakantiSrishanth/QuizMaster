@@ -1,28 +1,32 @@
+import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import Questions from "./Questions.jsx";
 import Options from "./Options.jsx";
+import Appbar from "./Appbar";
 
 function Display() {
+  const { userid } = useParams();
   let [selected, setSelected] = useState(false);
   let [topic, setTopic] = useState("");
-  let [type,setType]=useState("");
+  let [type, setType] = useState("");
 
   function handleChange() {
-    setSelected(prev => !prev);
-  }
-
-  function changeTopic(text) {
-    setTopic(text);
-  }
-  function changeType(text){
-    setType(text);
+    setSelected((prev) => !prev);
   }
 
   return (
     <>
-      {selected
-        ? <Questions change={handleChange} topic={topic} type={type} />
-        : <Options change={handleChange} changeTopic={changeTopic} changeType={changeType} />}
+      <Appbar id={userid}/>
+   
+      {selected ? (
+        <Questions change={handleChange} topic={topic} type={type} userid={userid}/>
+      ) : (
+        <Options
+          change={handleChange}
+          changeTopic={setTopic}
+          changeType={setType}
+        />
+      )}
     </>
   );
 }

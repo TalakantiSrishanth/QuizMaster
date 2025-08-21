@@ -34,7 +34,7 @@ function CircularProgressWithLabel({ value }) {
     </Box>
   );
 }
-function Questions({ change, topic, type }) {
+function Questions({ change, topic, type,userid }) {
   let [data, setData] = useState([]);
   let [queindex, setIndex] = useState(0);
   let [choices, setChoices] = useState([]);
@@ -43,6 +43,10 @@ function Questions({ change, topic, type }) {
   let [score, setScore] = useState(null);
   let [finish, setFinish] = useState(false);
   let [pieData, setPieData] = useState([]);
+  let [correct, setCorrect] = useState(0);
+let [incorrect, setIncorrect] = useState(0);
+let [unattempted, setUnattempted] = useState(0);
+
   useEffect(() => {
     if (queindex >= data.length) {
       calcTotal();
@@ -51,7 +55,7 @@ function Questions({ change, topic, type }) {
 
   useEffect(() => {
     async function getdata() {
-      const res = await fetch("/api/mcqs", {
+      const res = await fetch("http://localhost:5000/api/mcqs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic }),
@@ -90,7 +94,7 @@ function Questions({ change, topic, type }) {
   }
   async function handleReview() {
 
-    let response = await fetch("/api/review", {
+    let response = await fetch("http://localhost:5000/api/review", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -103,38 +107,46 @@ function Questions({ change, topic, type }) {
     setReview(result);
   }
  
-  function calcTotal() {
-    let correct = 0;
-    let attempted = 0;
+ function calcTotal() {
+  let correctCount = 0;
+  let attempted = 0;
 
-    data.forEach((q, idx) => {
-      const choice = choices[idx];
-      if (choice !== null) {
-        attempted++;
-        if (choice === q.answerIndex) correct++;
-      }
-    });
+  data.forEach((q, idx) => {
+    const choice = choices[idx];
+    if (choice !== null) {
+      attempted++;
+      if (choice === q.answerIndex) correctCount++;
+    }
+  });
 
-    const unattempted = data.length - attempted;
-    const incorrect = attempted - correct;
+  const unattemptedCount = data.length - attempted;
+  const incorrectCount = attempted - correctCount;
 
-    setScore(correct);
-   setPieData([
-  { label: "Correct", value: correct,color: '#4CAF50'},
-  { label: "Incorrect", value: incorrect,color:'#E3242B'},
-  { label: "Unattempted", value: unattempted,color:'rgba(213, 238, 25, 1)'},
-]);
+  setScore(correctCount);
+  setCorrect(correctCount);
+  setIncorrect(incorrectCount);
+  setUnattempted(unattemptedCount);
 
-  }
+  setPieData([
+    { label: "Correct", value: correctCount, color: '#4CAF50' },
+    { label: "Incorrect", value: incorrectCount, color: '#E3242B' },
+    { label: "Unattempted", value: unattemptedCount, color: 'rgba(213, 238, 25, 1)' },
+  ]);
+}
+
   async function handleFinish() {
 
-    let response = await fetch("/api/finish", {
+    let response = await fetch("http://localhost:5000/api/finish", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        score: score,
-        topic: topic,
-      }),
+      userid,         
+      score,
+      topic,
+      correct,
+      incorrect,
+      unattempted,
+    }),
     });
     let result = await response.json();
     setSuggestions(result);
