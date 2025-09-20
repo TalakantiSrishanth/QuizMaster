@@ -1,6 +1,6 @@
 const express = require("express");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const mongoose=require("mongoose");
+const mongoose = require("mongoose");
 mongoose.connect('mongodb://localhost:27017/QuizAI', {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -9,18 +9,22 @@ mongoose.connect('mongodb://localhost:27017/QuizAI', {
 }).catch(err => {
   console.error("MongoDB connection error:", err);
 });
-const userSchema=new mongoose.Schema({
- username: String,
-  password: String,
+const userSchema = new mongoose.Schema({
+  clerkId: { type: String, required: true, unique: true },
+  username:{ type:String},
   scores: [
     {
       topic: String,
       score: Number,
+      correct: Number,
+      incorrect: Number,
+      unattempted: Number,
       date: { type: Date, default: Date.now },
     },
   ],
 });
-const User=mongoose.model('User',userSchema);
+
+const User = mongoose.model('User', userSchema);
 
 const app = express();
 app.use(express.json());
@@ -28,48 +32,43 @@ app.use(express.json());
 const genAI = new GoogleGenerativeAI("AIzaSyAksY2CQC5A91zSmHIXg5__5mL3_J4HMnY");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-
-
-
-app.post("/register", async (req, res) => {
-  const { username, password } = req.body;
+app.get("/api/user/:id", async (req, res) => {
   try {
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
-    }
+    const { id } = req.params;
+    const user = await User.findOne({ clerkId: id });
+    if (!user) return res.json(null);
+    let total_correct=user.scores.reduce((acc,item)=> acc+item.correct,0);
+    let total_incorrect=user.scores.reduce((acc,item)=> acc+item.incorrect,0);
+    let total_unattempted=user.scores.reduce((acc,item)=> acc+item.unattempted,0);
 
-    const newUser = new User({ username, password });
-    await newUser.save();
-
-    res.status(201).json({ message: "User registered successfully"});
+    res.json({
+  ...user.toObject(),         
+  total_correct,
+  total_incorrect,
+  total_unattempted
+});
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
-app.post("/login",async (req,res)=>{
-  const {username,password}=req.body;
-  const existingUser=await User.findOne({username});
-  try{if(existingUser){
-    if(existingUser.password==password)
-      res.status(200).json({userid:existingUser._id});
-    else
-      res.status(401).json({message:"Wrong Password"});
+app.get("/api/leaderboard", async (req, res) => {
+  try {
+    const users = await User.find({});
+    const leaderboard = users.map(u => ({
+      clerkId: u.clerkId,
+      name: u.username, 
+      totalScore: u.scores.length > 0 
+  ? (u.scores.reduce((sum, s) => sum + s.score, 0) / u.scores.length).toFixed(2)
+  : 0,
+    }))
+    .sort((a, b) => b.totalScore - a.totalScore);
+    res.json({ users: leaderboard });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Something went wrong" });
   }
-  else res.status(404).json({message:"Enter Valid Username"});
-}
-catch(err){
-  res.status(500).json({error:"Something went wrong"});
-}
 });
-
-
-
-
-
-
-
 
 app.post("/api/mcqs", async (req, res) => {
   const { topic } = req.body;
@@ -97,7 +96,7 @@ app.post("/api/review", async (req, res) => {
       Explain the answer of ${question} in detail.
       Also, I chose ${selectedAnswer} — explain why it's wrong.
       Respond only in JSON with {"explanation": "...", "whyWrong": "..."}
-      Return ONLY valid JSON, no backticks, no code block, no extra text.
+      Return ONLY valid JSON, no backticks, no code block, no extra text.Do NOT include explanations, text, or extra commentary.Follow Exactly.
     `;
 
     const result = await model.generateContent(prompt);
@@ -111,26 +110,35 @@ app.post("/api/review", async (req, res) => {
 });
 
 app.post("/api/finish", async (req, res) => {
-  const { score, topic } = req.body;
+  const { userid,username, score, topic, correct, incorrect, unattempted } = req.body;
+ 
   try {
     const percentage = (score / 10) * 100;
-    await User.findByIdAndUpdate(userid, {
-      $push: {
-        scores: { topic, score }
-      }
-    });
+
+    await User.findOneAndUpdate(
+      { clerkId: userid },
+      {
+         $set: { username:username },
+        $push: {
+          scores: { topic, score, correct, incorrect, unattempted },
+        },
+      },
+      { new: true, upsert: true }
+    );
+
     let chance;
     if (percentage >= 90) chance = "Very High (90–100%)";
     else if (percentage >= 70) chance = "High (70–89%)";
     else if (percentage >= 50) chance = "Moderate (50–69%)";
     else chance = "Low (<50%)";
+
     const prompt = `
       I scored ${score}/10 (${percentage}%) in ${topic}.
+      Correct: ${correct}, Incorrect: ${incorrect}, Unattempted: ${unattempted}.
       Suggest how I can improve further, focusing on DSA and interview prep.
-      Suggest some topics to improve on.
       Respond only in JSON: {"suggestions": "..."}
       Return ONLY valid JSON, no backticks, no code block, no extra text.
-
+      Do NOT include explanations, text, or extra commentary.Follow Exactly.
     `;
 
     const result = await model.generateContent(prompt);
@@ -142,6 +150,7 @@ app.post("/api/finish", async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
 
 
 app.listen(5000, () => console.log("Server running on port 5000"));

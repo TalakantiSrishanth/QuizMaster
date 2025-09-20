@@ -1,18 +1,64 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./Login";
-import Register from "./Register";
+import { SignIn, SignUp, SignedIn, SignedOut } from "@clerk/clerk-react";
 import Display from "./Display";
-import Dashboard from "./Dashboard.jsx";
+import Dashboard from "./Dashboard";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/display/:userid" element={<Display />} />
-        <Route path="/dashboard/:userid" element={<Dashboard/>}/>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="/login"
+          element={
+            <>
+            <SignedIn>
+              <Navigate to="/display" />
+            </SignedIn>
+            <SignedOut>
+              <SignIn
+                path="/login"
+                routing="path"
+                redirectSettings={{ afterSignIn: "/display" }}
+              />
+            </SignedOut>
+            </>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <>
+            <SignedIn>
+              <Navigate to="/display" />
+            </SignedIn>
+            <SignedOut>
+              <SignUp
+                path="/register"
+                routing="path"
+                redirectSettings={{ afterSignUp: "/display" }}
+              />
+            </SignedOut>
+            </>
+          }
+        />
+        <Route
+          path="/display"
+          element={
+            <SignedIn>
+              <Display />
+            </SignedIn>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <SignedIn>
+              <Dashboard />
+            </SignedIn>
+          }
+        />
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );

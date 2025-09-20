@@ -1,74 +1,181 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
-} from "recharts";
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
+import { PieChart } from "@mui/x-charts/PieChart";
+import { LineChart } from "@mui/x-charts/LineChart";
+import { RingLoader } from "react-spinners";
+import Appbar from "./Appbar.jsx";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./Styles/Dashboard.css";
 
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#00C49F"];
-
-export default function Dashboard() {
-  const { userid } = useParams();
-  const [scores, setScores] = useState([]);
+function Dashboard() {
+  const { user } = useUser();
+  const [user_data, setData] = useState(null);
+  const [leaderboard, setLeaderboard] = useState(null);
+  const pData = user_data ? user_data.scores.map((item) => item.score) : [];
+  const xLabels = user_data
+    ? user_data.scores.map((item) =>
+        new Date(item.date).toLocaleDateString()
+      )
+    : [];
 
   useEffect(() => {
-    async function fetchScores() {
+    async function fetchData() {
       try {
-        const res = await fetch(`/api/user/${userid}`);
-        const data = await res.json();
-        setScores(data.scores || []);
+        let res = await fetch(`/api/user/${user.id}`);
+        if (!res.ok) throw new Error(`Error: ${res.status}`);
+        let d = await res.json();
+        setData(d);
+
+        res = await fetch("/api/leaderboard");
+        if (!res.ok) throw new Error(`Error: ${res.status}`);
+        d = await res.json();
+        
+        const sortedUsers = d.users.sort((a, b) => b.totalScore - a.totalScore);
+        setLeaderboard(sortedUsers);
       } catch (err) {
-        console.error("Error fetching dashboard:", err);
+        console.error("Fetch failed:", err);
       }
     }
-    if (userid) fetchScores();
-  }, [userid]);
-
-  if (!scores.length) return <p>No scores yet.</p>;
+    if (user?.id) fetchData();
+  }, [user?.id]);
+  if (!user_data || !leaderboard) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <RingLoader color="#df151cff" />
+      </div>
+    );
+  }
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Dashboard</h2>
+    <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+      <Appbar value={true} />
+      <div className="container my-4">
+        <div className="card shadow-sm rounded-3 mb-4 welcome-card">
+          <div className="card-body text-center">
+            <h3 className="fw-bold">Welcome, {user?.username}</h3>
+            <p className="text-muted">
+              Contests Attended: {user_data?.scores?.length || 0}
+            </p>
+          </div>
+        </div>
 
-      {/* Bar Chart */}
-      <div style={{ marginBottom: "2rem" }}>
-        <h3>Scores by Topic</h3>
-        <BarChart width={600} height={300} data={scores}>
-          <XAxis dataKey="topic" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="score" fill="#8884d8" />
-        </BarChart>
-      </div>
+        <div className="row g-3 px-3">
+          <div className="col-6 col-md-3">
+            <div className="card stat-card h-100 text-center border-success">
+              <div className="card-body text-success">
+                <h3 className="card-title">Correct</h3>
+                <h5 className="card-text">{user_data?.total_correct}</h5>
+              </div>
+            </div>
+          </div>
+          <div className="col-6 col-md-3">
+            <div className="card stat-card h-100 text-center border-danger">
+              <div className="card-body text-danger">
+                <h3 className="card-title">Incorrect</h3>
+                <h5 className="card-text">{user_data?.total_incorrect}</h5>
+              </div>
+            </div>
+          </div>
+          <div className="col-6 col-md-3">
+            <div className="card stat-card h-100 text-center border-warning">
+              <div className="card-body text-warning">
+                <h3 className="card-title">Unattempted</h3>
+                <h5 className="card-text">{user_data?.total_unattempted}</h5>
+              </div>
+            </div>
+          </div>
+          <div className="col-6 col-md-3">
+            <div className="card stat-card h-100 text-center border-info">
+              <div className="card-body text-info">
+                <h3 className="card-title">Total Score</h3>
+                <h5 className="card-text">
+                  {user_data?.scores?.reduce((acc, item) => acc + item.score, 0) ||
+                    0}
+                </h5>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="row my-4">
+          <div className="col-md-6 d-flex justify-content-center">
+            {user_data?.scores?.length ? (
+              <PieChart
+                series={[
+                  {
+                    data: [
+                      {
+                        id: 0,
+                        value: user_data?.total_correct,
+                        label: "Correct",
+                        color: "#28a745",
+                      },
+                      {
+                        id: 1,
+                        value: user_data?.total_incorrect,
+                        label: "Incorrect",
+                        color: "#dc3545",
+                      },
+                      {
+                        id: 2,
+                        value: user_data?.total_unattempted,
+                        label: "Unattempted",
+                        color: "#ffc107",
+                      },
+                    ],
+                  },
+                ]}
+                width={250}
+                height={250}
+              />
+            ) : (
+              <p className="text-muted text-center">No data to display</p>
+            )}
+          </div>
 
-      {/* Pie Chart */}
-      <div>
-        <h3>Score Distribution</h3>
-        <PieChart width={600} height={400}>
-          <Pie
-            data={scores}
-            dataKey="score"
-            nameKey="topic"
-            cx="50%"
-            cy="50%"
-            outerRadius={120}
-            label
-          >
-            {scores.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
+          <div className="col-md-6">
+            {pData.length ? (
+              <LineChart
+                height={300}
+                series={[{ data: pData, curve: "natural", color: "#007bff" }]}
+                xAxis={[{ scaleType: "point", data: xLabels }]}
+                yAxis={[{ width: 50 }]}
+                margin={{ right: 24 }}
+              />
+            ) : (
+              <p className="text-muted text-center">No scores to chart</p>
+            )}
+          </div>
+        </div>
+        <div className="mb-4">
+          <h3 className="text-center my-3 text-dark">🏆 Leaderboard</h3>
+          {leaderboard.length ? (
+            <div className="container">
+              <ol className="list-group">
+                {leaderboard.map((u, idx) => {
+                  if (!u.name) return null;
+                  return (
+                    <li
+                      key={idx}
+                      className={`list-group-item d-flex justify-content-between align-items-center ${
+                        u.clerkId === user_data?.clerkId ? "fw-bold current-user" : ""
+                      }`}
+                    >
+                      <span>{u.name}</span>
+                      <span className="badge bg-primary rounded-pill">
+                        {u.totalScore}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          ) : (
+            <p className="text-center text-muted">No leaderboard data</p>
+          )}
+        </div>
       </div>
     </div>
   );
 }
+
+export default Dashboard;

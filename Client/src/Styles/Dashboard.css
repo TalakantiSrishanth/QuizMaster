@@ -1,0 +1,22 @@
+.stat-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.stat-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.welcome-card {
+  background: linear-gradient(135deg, #e3f2fd, #ffffff);
+}
+
+.current-user {
+  background-color: #e0f7fa;
+}
+
+.list-group-item {
+  transition: background 0.2s;
+}
+.list-group-item:hover {
+  background-color: #f1f1f1;
+}
