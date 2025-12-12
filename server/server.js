@@ -1,7 +1,8 @@
 const express = require("express");
+require("dotenv").config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const mongoose = require("mongoose");
-mongoose.connect('mongodb://localhost:27017/QuizAI', {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => {
@@ -29,8 +30,8 @@ const User = mongoose.model('User', userSchema);
 const app = express();
 app.use(express.json());
 
-const genAI = new GoogleGenerativeAI("AIzaSyAksY2CQC5A91zSmHIXg5__5mL3_J4HMnY");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
 app.get("/api/user/:id", async (req, res) => {
   try {
