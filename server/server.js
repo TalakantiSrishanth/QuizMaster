@@ -30,8 +30,11 @@ const User = mongoose.model('User', userSchema);
 
 const app = express();
 app.use(express.json());
-app.use(cors());
-app.options("*", cors());
+app.use(cors({
+  origin: true,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+}));
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
