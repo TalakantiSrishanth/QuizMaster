@@ -60,7 +60,7 @@ function Questions({ change, topic, type }) {
 
   useEffect(() => {
     async function getdata() {
-      const res = await fetch(`https://quizmaster-c3yr.onrender.com/api/mcqs`, {
+      const res = await fetch(`https://quizmaster-2-icg5.onrender.com/api/mcqs`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic }),
@@ -100,7 +100,7 @@ function Questions({ change, topic, type }) {
   }
 
   async function handleReview() {
-    let response = await fetch(`https://quizmaster-c3yr.onrender.com/api/review`, {
+    let response = await fetch(`https://quizmaster-2-icg5.onrender.com/api/review`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -165,7 +165,7 @@ function Questions({ change, topic, type }) {
 
   async function handleFinish() {
 
-    let response = await fetch(`https://quizmaster-c3yr.onrender.com/api/finish`, {
+    let response = await fetch(`https://quizmaster-2-icg5.onrender.com/api/finish`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

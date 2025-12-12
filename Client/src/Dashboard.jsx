@@ -20,12 +20,12 @@ function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        let res = await fetch(`https://quizmaster-c3yr.onrender.com/api/user/${user.id}`);
+        let res = await fetch(`https://quizmaster-2-icg5.onrender.com/api/user/${user.id}`);
         if (!res.ok) throw new Error(`Error: ${res.status}`);
         let d = await res.json();
         setData(d);
 
-        res = await fetch(`https://quizmaster-c3yr.onrender.com/api/leaderboard`);
+        res = await fetch(`https://quizmaster-2-icg5.onrender.com/api/leaderboard`);
         if (!res.ok) throw new Error(`Error: ${res.status}`);
         d = await res.json();
         
