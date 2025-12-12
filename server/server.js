@@ -1,5 +1,6 @@
 const express = require("express");
 require("dotenv").config();
+const cors = require("cors");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const mongoose = require("mongoose");
 mongoose.connect(process.env.MONGO_URI, {
@@ -29,7 +30,8 @@ const User = mongoose.model('User', userSchema);
 
 const app = express();
 app.use(express.json());
-
+app.use(cors());
+app.options("*", cors());
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 

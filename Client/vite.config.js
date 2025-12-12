@@ -6,7 +6,11 @@ export default defineConfig({
   plugins: [react()],
    server: {
     proxy: {
-      '/api': 'http://localhost:5000'
+      '/api': {
+        target: 'https://quizmaster-c3yr.onrender.com',
+        changeOrigin: true, 
+        secure: false,
+      }
     }
   }
 })
