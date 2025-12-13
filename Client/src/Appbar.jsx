@@ -1,12 +1,14 @@
 import { UserButton } from "@clerk/clerk-react";
 import logo from "./assets/Logo2.png";
-import { Link } from "react-router-dom"; 
+import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-function Appbar({value}) {
+function Appbar({ value }) {
   return (
-    <nav className="navbar sticky-top navbar-expand-lg bg-body-tertiary">
-      <div className="container-fluid ms-7">
+    <nav className="navbar sticky-top bg-body-tertiary">
+      <div className="container-fluid d-flex justify-content-between align-items-center">
+
+        {/* LEFT: Logo */}
         <Link
           to="/"
           className="navbar-brand d-flex align-items-center text-decoration-none text-dark"
@@ -21,37 +23,27 @@ function Appbar({value}) {
           QuizMaster
         </Link>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        
+        <div className="d-flex align-items-center">
+          {!value ? (
+            <Link
+              to="/dashboard"
+              className="nav-link text-dark text-decoration-none me-3"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/display"
+              className="nav-link text-dark text-decoration-none me-3"
+            >
+              Display
+            </Link>
+          )}
 
-        <div className="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul className="navbar-nav ms-auto me-4 mb-2 mb-lg-0">
-            <li className="nav-item">
-           { !value?  <Link
-                to="/dashboard"
-                className="nav-link text-dark text-decoration-none"
-              >
-                Dashboard
-              </Link> :  <Link
-                to="/display"
-                className="nav-link text-dark text-decoration-none"
-              >
-                Display
-              </Link> }
-            </li>
-          </ul>
+          <UserButton />
         </div>
 
-        <UserButton />
       </div>
     </nav>
   );
