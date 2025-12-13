@@ -2,11 +2,11 @@
 A full-stack quiz platform that generates MCQs using **Google Gemini AI**, evaluates your answers, tracks performance, and provides improvement suggestions — all with a beautiful responsive UI.
 
 ## 🔗 **Live Demo**
-Frontend: quiz-master-six-tau.vercel.app  
+Frontend: https://quiz-master-six-tau.vercel.app/display  
 Backend API: https://quizmaster-2-icg5.onrender.com
 
 ## 📸 **Preview**
-(Add screenshots when ready)
+Add these little later
 
 ## ⭐ **Features**
 🧠 AI MCQs  
@@ -20,31 +20,44 @@ Backend API: https://quizmaster-2-icg5.onrender.com
 Frontend: React, Bootstrap, Clerk  
 Backend: Node.js, Express, MongoDB, Gemini AI  
 
-## 📁 **Project Structure**
-QuizMaster/
+## 📁 Project Structure
+```text
+AI/
 │
-├── src/
-│   ├── App.jsx
-│   ├── Appbar.jsx
-│   ├── Display.jsx
-│   ├── Dashboard.jsx
-│   ├── Questions.jsx
-│   ├── ShowIncorrect.jsx
-│   ├── Options.jsx
-│   └── Styles/
+├── Client/               # Frontend
+│   ├── public/
+│   ├── src/
+│   │   ├── App.jsx
+│   │   ├── Appbar.jsx
+│   │   ├── Display.jsx
+│   │   ├── Dashboard.jsx
+│   │   ├── Questions.jsx
+│   │   ├── ShowIncorrect.jsx
+│   │   ├── Options.jsx
+│   │   └── Styles/
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js
+│   └── README.md
 │
-├── public/
-│   └── logo.png
-│
-├── server.js
-├── package.json
-└── README.md
-```markdown
-## 📦 Install Dependencies
-```bash
-npm install
+└── server/               # Backend
+    ├── server.js
+    ├── .env
+    ├── package.json
+    └── node_modules/
 ```
+## 🖥 Frontend Setup
+```bash
+cd client
+npm install
+npm run dev
+```
+## 📦 Backend Setup
+```bash
+cd server
+npm install
 
+```
 ## 🔧 Create `.env` File
 ```ini
 MONGO_URI=your_mongodb_connection_string
@@ -54,14 +67,9 @@ PORT=5000
 
 ## ▶️ Run Server
 ```bash
+cd server
 node server.js
 ```
-
-## 🌐 Server URL
-```
-http://localhost:5000
-```
-
 ## 🧠 User Schema
 ```json
 {
@@ -121,6 +129,5 @@ Stores quiz results + generates AI suggestions.
   "incorrect": 2,
   "unattempted": 1
 }
-```
 ```
 
