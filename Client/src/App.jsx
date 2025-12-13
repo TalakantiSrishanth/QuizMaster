@@ -15,11 +15,13 @@ function App() {
               <Navigate to="/display" />
             </SignedIn>
             <SignedOut>
+              <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
               <SignIn
                 path="/login"
                 routing="path"
                 redirectSettings={{ afterSignIn: "/display" }}
               />
+              </div>
             </SignedOut>
             </>
           }
