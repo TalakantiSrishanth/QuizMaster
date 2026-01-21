@@ -1,26 +1,26 @@
-# 🚀 **QuizMaster – AI-Powered Interview Practice & Quiz Platform**  
+# **QuizMaster – AI-Powered Interview Practice & Quiz Platform**  
 A full-stack quiz platform that generates MCQs using **Google Gemini AI**, evaluates your answers, tracks performance, and provides improvement suggestions — all with a beautiful responsive UI.
 
-## 🔗 **Live Demo**
+## **Live Demo**
 Frontend: https://quiz-master-six-tau.vercel.app/display  
 Backend API: https://quizmaster-2-icg5.onrender.com
 
-## 📸 **Preview**
+## **Preview**
 Add these little later
 
-## ⭐ **Features**
-🧠 AI MCQs  
-🎯 Practice/Test modes  
-📊 Dashboard  
-🤖 AI suggestions  
-🔐 Clerk auth  
-📱 Responsive design  
+## **Features**
+ AI MCQs  
+ Practice/Test modes  
+ Dashboard  
+ AI suggestions  
+ Clerk auth  
+ Responsive design  
 
-## 🛠️ **Tech Stack**
+## **Tech Stack**
 Frontend: React, Bootstrap, Clerk  
 Backend: Node.js, Express, MongoDB, Gemini AI  
 
-## 📁 Project Structure
+## Project Structure
 ```text
 AI/
 │
@@ -46,31 +46,31 @@ AI/
     ├── package.json
     └── node_modules/
 ```
-## 🖥 Frontend Setup
+## Frontend Setup
 ```bash
 cd client
 npm install
 npm run dev
 ```
-## 📦 Backend Setup
+## Backend Setup
 ```bash
 cd server
 npm install
 
 ```
-## 🔧 Create `.env` File
+## Create `.env` File
 ```ini
 MONGO_URI=your_mongodb_connection_string
 GEMINI_API_KEY=your_google_gemini_api_key
 PORT=5000
 ```
 
-## ▶️ Run Server
+## Run Server
 ```bash
 cd server
 node server.js
 ```
-## 🧠 User Schema
+## User Schema
 ```json
 {
   "clerkId": "string",
@@ -88,15 +88,15 @@ node server.js
 }
 ```
 
-## 🔌 API Endpoints
+## API Endpoints
 
-### 🟦 GET /api/user/:id
+### GET /api/user/:id
 Returns user data + aggregated totals.
 
-### 🟦 GET /api/leaderboard
+### GET /api/leaderboard
 Returns users sorted by average score.
 
-### 🟩 POST /api/mcqs
+### POST /api/mcqs
 Generates 10 MCQs using Gemini AI.
 
 #### Request Body:
@@ -104,7 +104,7 @@ Generates 10 MCQs using Gemini AI.
 { "topic": "DSA" }
 ```
 
-### 🟩 POST /api/review
+### POST /api/review
 Returns explanation + why chosen answer is wrong.
 
 #### Request Body:
@@ -115,7 +115,7 @@ Returns explanation + why chosen answer is wrong.
 }
 ```
 
-### 🟩 POST /api/finish
+### POST /api/finish
 Stores quiz results + generates AI suggestions.
 
 #### Request Body:
